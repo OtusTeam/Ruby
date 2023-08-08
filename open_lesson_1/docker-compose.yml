@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:14
+    container_name: open_lesson_1_db
+    ports:
+      - 5432:5432
+    volumes:
+      - ./docker/postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+  web:
+    build: .
+    image: open_lesson_1/web:latest
+    container_name: open_lesson_1_web
+    depends_on:
+      - db
+    volumes:
+      - ./:/app
+      - /app/tmp
+    ports:
+      - 3000:3000
+    environment:
+      CREATE_DB_ON_INIT: 'true'
+      REDIS_URL: 'redis://redis:6379/'
+  redis:
+    image: redis
+    container_name: open_lesson_1_redis
+    ports:
+      - 6379:6379
+    volumes:
+      - ./docker/data/redis:/data

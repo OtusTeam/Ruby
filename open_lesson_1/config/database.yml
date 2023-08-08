@@ -1,0 +1,19 @@
+default: &default
+  adapter: postgresql
+  timeout: 5000
+  port: <%= ENV['DATABASE_PORT'] || 5432 %>
+  encoding: unicode
+
+development:
+  <<: *default
+  host: <%= ENV['DATABASE_HOST'] || 'db' %>
+  username: <%= ENV['DATABASE_USERNAME'] || 'postgres' %>
+  database: <%= ENV['DATABASE_NAME'] || 'demo_rails_development' %>
+  password: <%= ENV['DATABASE_PASSWORD'] || '' %>
+
+test:
+  <<: *default
+  host: <%= ENV['DATABASE_HOST'] || 'db' %>
+  username: <%= ENV['DATABASE_USERNAME'] || 'postgres' %>
+  password: <%= ENV['DATABASE_PASSWORD'] || '' %>
+  database: demo_rails_test

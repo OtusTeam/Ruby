@@ -1,0 +1,23 @@
+require: rubocop-rails
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.2
+ 
+Metrics/AbcSize:
+  Max: 30
+  
+Rails/CreateTableWithTimestamps:
+  Enabled: false
+  
+Style/ClassAndModuleChildren:
+  Enabled: False
+  
+Style/Documentation:
+  Enabled: false
+  
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/RedundantFetchBlock:
+  Enabled: false
