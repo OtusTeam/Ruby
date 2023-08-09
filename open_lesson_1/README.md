@@ -1,5 +1,7 @@
 # Demo Rails
 
+http://127.0.0.1:3000/ - адрес приложения
+
 ### Команды в помощь
 docker-compose build - Сборка образа с приложением
 docker-compose up -d - Запуск контейнеров приложения
@@ -40,15 +42,18 @@ class Message < ApplicationRecord
 end
 
 ## Добавить в config/routes.rb
-root 'chats#index'
+root 'welcome#index'
 resources :chats, only: %i[create show] do
   resources :messages, only: %i[create]
 end
 
+## Добавить app/controllers/welcome_controller.rb
+class WelcomeController < ApplicationController
+  def index; end
+end
+
 ## Добавить app/controllers/chats_controller.rb
 class ChatsController < ApplicationController
-  def index; end
-
   def show
     @chat = Chat.find(params[:id])
   end
@@ -120,7 +125,7 @@ class ChatgptResponseJob < ApplicationJob
   end
 end
 
-## Добавить app/views/chats/index.html.haml
+## Добавить app/views/welcome/index.html.haml
 .main
   .px-4.py-5.my-5.text-center
     %h1 Онлайн-интервьюер
