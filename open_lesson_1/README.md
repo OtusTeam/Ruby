@@ -8,16 +8,16 @@ docker-compose up -d - Запуск контейнеров приложения
 docker-compose exec web bash - Запуск bash внутри контейнера web
 pumactl restart - Рестарт веб-сервера Puma
 
-## Запустить миграции данных внутри контейнера
-bin/rails generate migration CreateChats
-bin/rails generate migration CreateMessages chat:references role:integer content:string
+## Создать модели и миграции через генератор моделей. Запустить миграции внутри контейнера
+bin/rails generate model Chat
+bin/rails generate model Message chat:references role:integer content:string
 
-## Добавить модель chat.rb
+## Дополнить модель Chat (app/models/chat.rb) новым кодом
 class Chat < ApplicationRecord
   has_many :messages, dependent: :destroy
 end
 
-## Добавить модель message.rb
+## Дополнить модель Message (app/models/message.rb) новым кодом
 class Message < ApplicationRecord
   include ActionView::RecordIdentifier
 
@@ -41,18 +41,21 @@ class Message < ApplicationRecord
   end
 end
 
-## Добавить в config/routes.rb
+
+## Добавить WelcomeController с index action
+bin/rails generate controller Welcome index
+
+## Поменять config/routes.rb
 root 'welcome#index'
-resources :chats, only: %i[create show] do
-  resources :messages, only: %i[create]
-end
 
-## Добавить app/controllers/welcome_controller.rb
-class WelcomeController < ApplicationController
-  def index; end
-end
 
-## Добавить app/controllers/chats_controller.rb
+## Добавить ChatsController с index и show actions (например, без хелпера и роута)
+bin/rails generate controller Chats index show --no-helper --skip-routes
+
+## Добавить в config/routes.rb
+resources :chats, only: %i[create show]
+
+## Дополним ChatsController (app/controllers/chats_controller.rb) новым кодом
 class ChatsController < ApplicationController
   def show
     @chat = Chat.find(params[:id])
@@ -64,7 +67,11 @@ class ChatsController < ApplicationController
   end
 end
 
-## Добавить app/controllers/messages_controller.rb
+
+## Добавить MessagesController с create action (например, без хелпера и роута)
+bin/rails generate controller Messages create --no-helper --skip-routes
+
+## Дополним MessagesController (app/controllers/messages_controller.rb) новым кодом
 class MessagesController < ApplicationController
   def create
     @chat = Chat.find(params[:chat_id])
@@ -83,6 +90,12 @@ class MessagesController < ApplicationController
     params.require(:message).permit(:content)
   end
 end
+
+## Добавить в config/routes.rb
+resources :chats, only: %i[create show] do
+  resources :messages, only: %i[create]
+end
+
 
 ## Добавить app/jobs/chatgpt_response_job.rb
 class ChatgptResponseJob < ApplicationJob
@@ -125,7 +138,7 @@ class ChatgptResponseJob < ApplicationJob
   end
 end
 
-## Добавить app/views/welcome/index.html.haml
+## Добавить в app/views/welcome/index.html.haml
 .main
   .px-4.py-5.my-5.text-center
     %h1 Онлайн-интервьюер
@@ -133,7 +146,7 @@ end
       %p.lead.mb-4 Сервис помогает подготовиться к собеседованию на заданную пользователем должность
       = button_to "Начать собеседование", chats_path, method: :post, class: "btn btn-primary btn-lg"
 
-## Добавить app/views/chats/show.html.haml
+## Добавить в app/views/chats/show.html.haml
 .main
   .px-4.py-5.my-5.text-center
     %h1 Чат №#{@chat.id}
@@ -144,14 +157,14 @@ end
   
       = render partial: "messages/form", locals: { chat: @chat }
 
-## Добавить app/views/messages/_form.html.haml
+## Добавить в app/views/messages/_form.html.haml
 = turbo_frame_tag "#{dom_id(chat)}_message_form" do
   = form_with(model: Message.new, url: chat_messages_path(chat)) do |form|
     = form.text_area :content, rows: 5, cols: 80
     %br= form.button 'Отправить', type: :submit, class: 'btn btn-success'
 
 
-## Добавить app/views/messages/_message.html.haml
+## Добавить в app/views/messages/_message.html.haml
 %div{id: "#{dom_id(message)}_messages"}
   - if message.user?
     .alert.alert-success
@@ -160,7 +173,7 @@ end
     .alert.alert-dark
       = message.content
 
-## Добавить app/views/nessages/create.turbo_stream.haml
+## Добавить в app/views/nessages/create.turbo_stream.haml
 = turbo_stream.append "#{dom_id(@message.chat)}_messages" do
   = render "message", message: @message
 = turbo_stream.replace "#{dom_id(@message.chat)}_message_form" do
