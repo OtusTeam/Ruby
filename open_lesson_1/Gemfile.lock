@@ -86,6 +86,15 @@ GEM
     faraday-net_http (3.0.2)
     globalid (1.1.0)
       activesupport (>= 5.0)
+    haml (6.3.0)
+      temple (>= 0.8.2)
+      thor
+      tilt
+    haml-rails (2.1.0)
+      actionpack (>= 5.1)
+      activesupport (>= 5.1)
+      haml (>= 4.0.6)
+      railties (>= 5.1)
     hamlit (3.0.3)
       temple (>= 0.8.2)
       thor
@@ -220,6 +229,7 @@ PLATFORMS
 DEPENDENCIES
   bootsnap
   dotenv-rails
+  haml-rails
   hamlit
   importmap-rails
   pg (~> 1.1)
