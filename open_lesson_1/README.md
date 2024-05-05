@@ -2,6 +2,8 @@
 
 http://127.0.0.1:3000/ - адрес приложения
 
+.env - сюда прописать OpenAI ChatGPT Key для взаимодействия с API
+
 ### Команды в помощь
 docker-compose build - Сборка образа с приложением
 docker-compose up -d - Запуск контейнеров приложения
@@ -49,11 +51,11 @@ bin/rails generate controller Welcome index
 root 'welcome#index'
 
 
-## Добавить ChatsController с index и show actions (например, без хелпера и роута)
-bin/rails generate controller Chats index show --no-helper --skip-routes
+## Добавить ChatsController с show и create actions (например, без хелпера и роута)
+bin/rails generate controller Chats show create --no-helper --skip-routes
 
 ## Добавить в config/routes.rb
-resources :chats, only: %i[create show]
+resources :chats, only: %i[show create]
 
 ## Дополним ChatsController (app/controllers/chats_controller.rb) новым кодом
 class ChatsController < ApplicationController
@@ -92,7 +94,7 @@ class MessagesController < ApplicationController
 end
 
 ## Добавить в config/routes.rb
-resources :chats, only: %i[create show] do
+resources :chats, only: %i[show create] do
   resources :messages, only: %i[create]
 end
 
